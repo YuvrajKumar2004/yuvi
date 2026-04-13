@@ -3,11 +3,14 @@ package com.yuvraj.service;
 import com.yuvraj.model.*;
 import com.yuvraj.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,7 +109,7 @@ public class CoordinatorService {
                 List<Object>row=new ArrayList<>();
                 row.add(s.getEnrollmentNo());
                 for(String key:fieldKeys){
-                    row.add(getStudentFields(s,key));
+                    row.add(getStudentField(s,key));
                 }
                 row.add(app.getSelectedCv());
                 row.add(app.getCreatedAt().toString());
@@ -122,4 +125,68 @@ public class CoordinatorService {
      * If a round with the same roundNumber already exists for that application, update it;
      * otherwise create a new one.
      */
+    @Transactional
+    public void upsertRound(Long postId,Long coordinatorId,Long applicationId,
+                            int roundNumber,String description,String date,
+                            String centre,String time,String status){
+        getPost(postId,coordinatorId);//ownership check
+
+        Application app=applicationRepository.findById(applicationId)
+                .orElseThrow(()->new RuntimeException("Application Not Found"));
+
+        ApplicationRound round=roundRepository.findByApplicationIdAndRoundNumber(applicationId,roundNumber)
+                .orElse(ApplicationRound.builder().application(app).roundNumber(roundNumber).build());
+
+        round.setDescription(description);
+        round.setDate(date !=null && !date.isBlank() ? LocalDate.parse(date):null);
+        round.setCentre(centre);
+        round.setTime(time);
+        round.setStatus(status);
+        roundRepository.save(round);
+
+        //Notify student of result
+        String notifBody="SELECTED".equals(status)
+                ?"Congratulations! You are selected for Round "+roundNumber+" at"+app.getOpportunity().getCompanyName()
+                :"Regret To inform you that you are not Qualified for round  "+roundNumber+" at"+app.getOpportunity().getCompanyName();
+        Notification notification=Notification.builder().
+                user(app.getStudent().getUser()).title("Round "+roundNumber+" Result")
+                .body(notifBody).build();
+        notificationrepository.save(notification);
+
+    }
+
+    //HELPER
+    private Opportunity getPost(Long postId,Long coordinatorId){
+        Opportunity opportunity=opportunityrepository.findById(postId)
+                .orElseThrow(()->new RuntimeException("Post not Found"));
+        if(!opportunity.getCoordinator().getId().equals(coordinatorId)){
+            throw  new RuntimeException("Access Denied");
+        }
+        return opportunity;
+    }
+    private void saveSharedFields(Opportunity opp, List<String> keys) {
+        if (keys == null) return;
+        for (String key : keys) {
+            StudentSharedField f = StudentSharedField.builder()
+                    .opportunity(opp).fieldKey(key).build();
+            shareFieldRepository.save(f);
+        }
+    }
+
+    private Object getStudentField(StudentProfile s, String key) {
+        return switch (key) {
+            case "email"          -> s.getEmail();
+            case "mobile"         -> s.getMobile();
+            case "branch"         -> s.getBranch();
+            case "cgpa"           -> s.getCgpa();
+            case "xPercentage"    -> s.getXPercentage();
+            case "xiiPercentage"  -> s.getXiiPercentage();
+            case "activeBacklogs" -> s.getActiveBacklogs();
+            case "deadBacklogs"   -> s.getDeadBacklogs();
+            case "cv1Url"         -> s.getCv1Url1();
+            case "cv2Url"         -> s.getCv2Url1();
+            case "cv3Url"         -> s.getCv3Url1();
+            default               -> "";
+        };
+    }
 }
