@@ -50,5 +50,5 @@ public class Opportunity {
     @OneToMany(mappedBy = "opportunity",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Application>applications;
     @OneToMany(mappedBy = "opportunity",cascade = CascadeType.ALL,orphanRemoval = true)
-    private  List<StudentShareField>shareFields;
+    private  List<StudentSharedField>shareFields;
 }
