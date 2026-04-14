@@ -14,7 +14,7 @@ public class StudentProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id",unique = true,nullable = false)
     private User user;
 
