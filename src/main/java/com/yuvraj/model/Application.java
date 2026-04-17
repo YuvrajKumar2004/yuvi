@@ -29,6 +29,7 @@ public class Application {
     @Column(nullable = false)
     private boolean acceptedTerms;
     @Column(nullable = false)
+    @Builder.Default
     private LocalDateTime createdAt=LocalDateTime.now();
     @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ApplicationRound>rounds;

@@ -2,11 +2,12 @@ package com.yuvraj.controller;
 
 import com.yuvraj.service.StudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@RestController
+@Controller
 @RequestMapping("/student")
 @RequiredArgsConstructor
 public class StudentController {
@@ -23,7 +24,7 @@ public class StudentController {
         model.addAttribute("onCampus",service.getEligibleOnCampusOpportunities(userId));
         model.addAttribute("offCampus",service.getOffCampusOpportunities());
         model.addAttribute("applied",service.getApplied(userId));
-        model.addAttribute("notification",service.getNotifications(userId));
+        model.addAttribute("notifications",service.getNotifications(userId));
         model.addAttribute("activeTab","profile");
         return "student/dashboard";
     }
@@ -34,7 +35,7 @@ public class StudentController {
         model.addAttribute("onCampus",service.getEligibleOnCampusOpportunities(userId));
         model.addAttribute("offCampus",service.getOffCampusOpportunities());
         model.addAttribute("applied",service.getApplied(userId));
-        model.addAttribute("notification",service.getNotifications(userId));
+        model.addAttribute("notifications",service.getNotifications(userId));
         model.addAttribute("activeTab","opportunities");
         return "student/dashboard";
     }
@@ -45,7 +46,7 @@ public class StudentController {
         model.addAttribute("onCampus",service.getEligibleOnCampusOpportunities(userId));
         model.addAttribute("offCampus",service.getOffCampusOpportunities());
         model.addAttribute("applied",service.getApplied(userId));
-        model.addAttribute("notification",service.getNotifications(userId));
+        model.addAttribute("notifications",service.getNotifications(userId));
         model.addAttribute("activeTab","applied");
         return "student/dashboard";
     }
@@ -56,7 +57,7 @@ public class StudentController {
         model.addAttribute("onCampus",service.getEligibleOnCampusOpportunities(userId));
         model.addAttribute("offCampus",service.getOffCampusOpportunities());
         model.addAttribute("applied",service.getApplied(userId));
-        model.addAttribute("notification",service.getNotifications(userId));
+        model.addAttribute("notifications",service.getNotifications(userId));
         model.addAttribute("activeTab","notifications");
 
         return "student/dashboard";
@@ -76,12 +77,12 @@ public class StudentController {
     }
 
     @PostMapping("/apply")
-    public String apply(@RequestParam Long oppotunityId,
+    public String apply(@RequestParam Long opportunityId,
                         @RequestParam String selectedCv,
                         RedirectAttributes ra){
         Long userId= authHelper.getCurrentUserId();
         try{
-            service.apply(userId,oppotunityId,selectedCv);
+            service.apply(userId,opportunityId,selectedCv);
             ra.addFlashAttribute("success","Application Submitted Successfully!");
         } catch (Exception e) {
             ra.addFlashAttribute("error",e.getMessage());

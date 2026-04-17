@@ -5,7 +5,7 @@ import com.yuvraj.model.StudentProfile;
 import com.yuvraj.model.User;
 import com.yuvraj.model.enums.PlacementStatus;
 import com.yuvraj.model.enums.Role;
-import com.yuvraj.repository.Auditlogrepository;
+import com.yuvraj.repository.AuditlogRepository;
 import com.yuvraj.repository.StudentProfileRepository;
 import com.yuvraj.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.Map;
 public class CcdService {
     private final UserRepository userRepository;
     private final StudentProfileRepository studentProfileRepository;
-    private final Auditlogrepository auditlogrepository;
+    private final AuditlogRepository auditlogrepository;
     private final PasswordEncoder passwordEncoder;
 
     //------DASHBOARD---------------
@@ -58,6 +58,7 @@ public class CcdService {
         stats.put("normalPlaced",normalPlaced);
         stats.put("unplaced",unplaced);
         stats.put("branchTotal",branchTotal);
+        stats.put("branchPlaced",branchPlaced);
         stats.put("lockedCount",lockedCount);
         return stats;
     }

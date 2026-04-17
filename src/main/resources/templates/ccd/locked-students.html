@@ -10,7 +10,7 @@
 
 <nav class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
-        <a th:href="@{/ccd/dashboard}" class="text-gray-500 hover:text-gray-700 text-sm">← Dashboard</a>
+        <a th:href="@{/ccd/dashboard}" class="text-gray-500 hover:text-gray-700 text-sm">&larr; Dashboard</a>
         <span class="text-gray-300">|</span>
         <span class="text-sm font-medium text-gray-700">Locked students</span>
     </div>
@@ -21,17 +21,14 @@
 </nav>
 
 <div class="max-w-4xl mx-auto px-4 py-6">
-
     <div th:if="${success}" class="bg-green-50 border border-green-200 text-green-800 text-sm rounded px-4 py-3 mb-4" th:text="${success}"></div>
 
     <h1 class="text-lg font-semibold text-gray-800 mb-6">
         Locked students
-        <span class="text-gray-400 font-normal text-sm ml-2"
-              th:text="'(' + ${lockedStudents.size()} + ')'"></span>
+        <span class="text-gray-400 font-normal text-sm ml-2" th:text="'(' + ${lockedStudents.size()} + ')'"></span>
     </h1>
 
-    <div th:if="${lockedStudents.isEmpty()}"
-         class="bg-white rounded-xl border border-gray-200 p-10 text-center text-sm text-gray-400">
+    <div th:if="${lockedStudents.isEmpty()}" class="bg-white rounded-xl border border-gray-200 p-10 text-center text-sm text-gray-400">
         No students are currently locked.
     </div>
 
@@ -47,19 +44,17 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="s : ${lockedStudents}"
-                class="border-t border-gray-100 hover:bg-gray-50">
-                <td class="px-5 py-3 font-mono text-xs text-gray-700" th:text="${s.enrollment}"></td>
-                <td class="px-5 py-3 text-gray-700" th:text="${s.name ?: '—'}"></td>
-                <td class="px-5 py-3 text-gray-500" th:text="${s.branch ?: '—'}"></td>
-                <td class="px-5 py-3 text-gray-500" th:text="${s.email ?: '—'}"></td>
+            <tr th:each="s : ${lockedStudents}" class="border-t border-gray-100 hover:bg-gray-50">
+                <td class="px-5 py-3 font-mono text-xs text-gray-700" th:text="${s.enrollmentNo}"></td>
+                <td class="px-5 py-3 text-gray-700" th:text="${s.name ?: '-'}"></td>
+                <td class="px-5 py-3 text-gray-500" th:text="${s.branch ?: '-'}"></td>
+                <td class="px-5 py-3 text-gray-500" th:text="${s.email ?: '-'}"></td>
                 <td class="px-5 py-3 text-center">
                     <form th:action="@{/ccd/admin/students/lock}" method="post" class="inline">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                        <input type="hidden" name="enrollment" th:value="${s.enrollment}"/>
+                        <input type="hidden" name="enrollment" th:value="${s.enrollmentNo}"/>
                         <input type="hidden" name="locked" value="false"/>
-                        <button type="submit"
-                                class="text-xs border border-green-200 text-green-700 hover:bg-green-50 px-3 py-1 rounded-lg transition">
+                        <button type="submit" class="text-xs border border-green-200 text-green-700 hover:bg-green-50 px-3 py-1 rounded-lg transition">
                             Unlock
                         </button>
                     </form>

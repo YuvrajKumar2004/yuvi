@@ -18,11 +18,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CoordinatorService {
 
-    private final Opportunityrepository opportunityrepository;
+    private final OpportunityRepository opportunityrepository;
     private final ApplicationRepository applicationRepository;
-    private final Applicationroundrepository roundRepository;
+    private final ApplicationroundRepository roundRepository;
     private final StudentShareFieldRepository shareFieldRepository;
-    private final Notificationrepository notificationrepository;
+    private final NotificationRepository notificationrepository;
     private final UserRepository userRepository;
     private final EligibilityService eligibilityService;
 

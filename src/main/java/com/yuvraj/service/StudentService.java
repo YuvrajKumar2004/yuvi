@@ -6,8 +6,8 @@ import com.yuvraj.model.Opportunity;
 import com.yuvraj.model.StudentProfile;
 import com.yuvraj.model.enums.OpportunityCategory;
 import com.yuvraj.repository.ApplicationRepository;
-import com.yuvraj.repository.Notificationrepository;
-import com.yuvraj.repository.Opportunityrepository;
+import com.yuvraj.repository.NotificationRepository;
+import com.yuvraj.repository.OpportunityRepository;
 import com.yuvraj.repository.StudentProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,9 +19,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentService {
     private final StudentProfileRepository studentProfileRepository;
-    private final Opportunityrepository opportunityrepository;
+    private final OpportunityRepository opportunityrepository;
     private final ApplicationRepository applicationRepository;
-    private final Notificationrepository notificationrepository;
+    private final NotificationRepository notificationrepository;
     private final EligibilityService eligibilityService;
 
     /* RETURN THE STUDENT'S PROFILE FOR THE LOGGED-IN USER.*/

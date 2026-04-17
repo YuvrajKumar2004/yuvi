@@ -6,15 +6,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@RestController
+@Controller
 @RequestMapping("/coordinator")
 @RequiredArgsConstructor
 public class CoordinatorController {
@@ -34,6 +36,9 @@ public class CoordinatorController {
     public String newPostPage(Model model){
         model.addAttribute("opportunity",new Opportunity());
         model.addAttribute("editMode",false);
+        model.addAttribute("deadlineValue","");
+        model.addAttribute("eligibilityXiiValue",null);
+        model.addAttribute("selectedSharedFields", List.of());
         return "coordinator/post-form";
     }
 
@@ -48,6 +53,11 @@ public class CoordinatorController {
                 .orElseThrow(()->new RuntimeException("Post not Found"));
         model.addAttribute("opportunity",opp);
         model.addAttribute("editMode",true);
+        model.addAttribute("deadlineValue", opp.getDeadline() != null ? opp.getDeadline().toLocalDate().toString() : "");
+        model.addAttribute("eligibilityXiiValue", opp.getGetEligibilityXiiPercentage());
+        model.addAttribute("selectedSharedFields",
+                opp.getShareFields() == null ? List.of() :
+                        opp.getShareFields().stream().map(f -> f.getFieldKey()).collect(Collectors.toList()));
         return "coordinator/post-form";
     }
 
@@ -60,7 +70,7 @@ public class CoordinatorController {
                              RedirectAttributes ra){
         Long userId= authHelper.getCurrentUserId();
         if(deadlineStr !=null && !deadlineStr.isBlank()){
-            opportunity.setDeadline(LocalDateTime.parse(deadlineStr));
+            opportunity.setDeadline(LocalDate.parse(deadlineStr).atStartOfDay());
         }
         coordinatorService.createPost(opportunity,userId,sharedFields);
         ra.addFlashAttribute("success","Post Created Successfully.");
@@ -75,7 +85,7 @@ public class CoordinatorController {
                              RedirectAttributes ra){
         Long userId= authHelper.getCurrentUserId();
         if(deadlineStr !=null && !deadlineStr.isBlank()){
-            opportunity.setDeadline(LocalDateTime.parse(deadlineStr));
+            opportunity.setDeadline(LocalDate.parse(deadlineStr).atStartOfDay());
         }
         coordinatorService.updatePost(id,opportunity,userId,sharedFiels);
         ra.addFlashAttribute("success","Post updated. Ineligible applications removed.");
@@ -86,8 +96,9 @@ public class CoordinatorController {
     @GetMapping("/posts/{id}/applications")
     public String viewApplications(@PathVariable Long id,Model model){
         Long userId= authHelper.getCurrentUserId();
+        model.addAttribute("postId",id);
         model.addAttribute("applications",coordinatorService.getApplicationsForPost(id,userId));
-        return "coordinator/applications";
+        return "coordinator/application";
     }
     //=============CSV Export===============
 

@@ -29,5 +29,12 @@ public class AuditLog {
     private String meta; // JSON string
 
     @Column(nullable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }

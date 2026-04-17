@@ -21,7 +21,7 @@ public interface StudentProfileRepository extends JpaRepository<StudentProfile,L
     List<Object[]> countByBranchGrouped();
 
     @Query("SELECT s.branch, COUNT(s) FROM StudentProfile s " +
-            "WHERE s.placementStatus != com.yuvraj.enums.PlacementStatus.UNPLACED " +
+            "WHERE s.placementStatus != com.yuvraj.model.enums.PlacementStatus.UNPLACED " +
             "GROUP BY s.branch")
     List<Object[]> countPlacedByBranchGrouped();
 

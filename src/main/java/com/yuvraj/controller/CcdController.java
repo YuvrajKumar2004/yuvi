@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@Controller
 @RequestMapping("/ccd")
 @RequiredArgsConstructor
 public class CcdController {
@@ -61,6 +62,18 @@ public class CcdController {
         return "ccd/locked-students";
     }
 
+
+    @PostMapping("/admin/students/lock")
+    @PreAuthorize("hasRole('CCD_ADMIN')")
+    public String setStudentLock(@RequestParam String enrollment,
+                                 @RequestParam boolean locked,
+                                 RedirectAttributes ra){
+        Long actorId= authHelper.getCurrentUserId();
+        ccdService.setLocked(enrollment,locked,actorId);
+        ra.addFlashAttribute("success",locked ? "Student locked." : "Student unlocked.");
+        return "redirect:/ccd/admin/students";
+    }
+
     //=============Student Search & edit (admin only)====================
 
     @GetMapping("/admin/students")
@@ -72,7 +85,7 @@ public class CcdController {
                 model.addAttribute("foundStudent",ccdService.searchByEnrollment(enrollment));
 
             } catch (Exception e) {
-                model.addAttribute("searcherror",e.getMessage());
+                model.addAttribute("searchError",e.getMessage());
             }
         }
         return "ccd/students";
@@ -81,21 +94,31 @@ public class CcdController {
     @GetMapping("/admin/students/{userId}/edit")
     @PreAuthorize("hasRole('CCD_ADMIN')")
     public String editStudentPage(@PathVariable Long userId,Model model){
-        model.addAttribute("student",ccdService.getStudentByuserId(userId));
+        StudentProfile student = ccdService.getStudentByuserId(userId);
+        model.addAttribute("student",student);
+        model.addAttribute("studentDisplayName",
+                student.getName() != null && !student.getName().isBlank() ? student.getName() : student.getEnrollmentNo());
         return "ccd/edit-student";
     }
     @PostMapping("/admin/students/{userId}/edit")
+    @PreAuthorize("hasRole('CCD_ADMIN')")
     public String updateStudentProfile(@PathVariable Long userId,
                                        @ModelAttribute StudentProfile profile,
                                        RedirectAttributes ra){
         Long actorId= authHelper.getCurrentUserId();
         ccdService.updateStudentProfile(userId,profile,actorId);
         ra.addFlashAttribute("success","Profile updated.");
-        return "redirect:ccd/admin/students/"+userId+"/edit";
+        return "redirect:/ccd/admin/students/"+userId+"/edit";
     }
 
     //============Add single Student(admin only)===================
     @GetMapping("/admin/students/add")
+    @PreAuthorize("hasRole('CCD_ADMIN')")
+    public String addStudentPage(Model model) {
+        model.addAttribute("student", new StudentProfile());
+        return "ccd/add-student";
+    }
+    @PostMapping("/admin/students/add")
     @PreAuthorize("hasRole('CCD_ADMIN')")
     public String addStudent(@RequestParam String loginId,
                              @RequestParam String password,

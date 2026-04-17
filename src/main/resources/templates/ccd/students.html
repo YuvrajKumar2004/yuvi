@@ -10,7 +10,7 @@
 
 <nav class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
-        <a th:href="@{/ccd/dashboard}" class="text-gray-500 hover:text-gray-700 text-sm">← Dashboard</a>
+        <a th:href="@{/ccd/dashboard}" class="text-gray-500 hover:text-gray-700 text-sm">&larr; Dashboard</a>
         <span class="text-gray-300">|</span>
         <span class="text-sm font-medium text-gray-700">Manage students</span>
     </div>
@@ -21,33 +21,28 @@
 </nav>
 
 <div class="max-w-4xl mx-auto px-4 py-6">
+    <div th:if="${success}" class="bg-green-50 border border-green-200 text-green-800 text-sm rounded px-4 py-3 mb-4" th:text="${success}"></div>
+    <div th:if="${searchError}" class="bg-red-50 border border-red-200 text-red-800 text-sm rounded px-4 py-3 mb-4" th:text="${searchError}"></div>
 
-    <div th:if="${success}"     class="bg-green-50 border border-green-200 text-green-800 text-sm rounded px-4 py-3 mb-4" th:text="${success}"></div>
-    <div th:if="${searchError}" class="bg-red-50 border border-red-200 text-red-800 text-sm rounded px-4 py-3 mb-4"   th:text="${searchError}"></div>
-
-    <!-- Search -->
     <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
         <h2 class="text-sm font-semibold text-gray-700 mb-4">Search student by enrollment</h2>
         <form th:action="@{/ccd/admin/students}" method="get" class="flex gap-3">
             <input type="text" name="enrollment" placeholder="e.g. 23CS001" required
                    class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-            <button type="submit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
                 Search
             </button>
         </form>
     </div>
 
-    <!-- Found student -->
     <div th:if="${foundStudent}" class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
         <div class="flex items-start justify-between mb-4">
             <div>
-                <div class="font-semibold text-gray-800" th:text="${foundStudent.name ?: foundStudent.enrollment}"></div>
+                <div class="font-semibold text-gray-800" th:text="${foundStudent.name ?: foundStudent.enrollmentNo}"></div>
                 <div class="text-xs text-gray-400 mt-0.5"
-                     th:text="${foundStudent.enrollment + ' · ' + (foundStudent.branch ?: '—') + ' · ' + (foundStudent.email ?: '—')}"></div>
+                     th:text="${foundStudent.enrollmentNo + ' | ' + (foundStudent.branch ?: '-') + ' | ' + (foundStudent.email ?: '-')}"></div>
             </div>
-            <span th:text="${foundStudent.placementStatus}"
-                  class="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-600"></span>
+            <span th:text="${foundStudent.placementStatus}" class="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-600"></span>
         </div>
 
         <div class="flex gap-3 flex-wrap text-xs">
@@ -56,10 +51,9 @@
                 Edit profile
             </a>
 
-            <!-- Lock / Unlock -->
             <form th:action="@{/ccd/admin/students/lock}" method="post" class="inline">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <input type="hidden" name="enrollment" th:value="${foundStudent.enrollment}"/>
+                <input type="hidden" name="enrollment" th:value="${foundStudent.enrollmentNo}"/>
                 <input type="hidden" name="locked" th:value="${!foundStudent.user.locked}"/>
                 <button type="submit"
                         th:text="${foundStudent.user.locked} ? 'Unlock student' : 'Lock student'"
@@ -69,7 +63,6 @@
         </div>
     </div>
 
-    <!-- Lock/Unlock by enrollment (quick form) -->
     <div class="bg-white rounded-xl border border-gray-200 p-6">
         <h2 class="text-sm font-semibold text-gray-700 mb-4">Lock / Unlock by enrollment</h2>
         <form th:action="@{/ccd/admin/students/lock}" method="post" class="flex gap-3 items-end flex-wrap">
@@ -81,14 +74,12 @@
             </div>
             <div>
                 <label class="block text-xs text-gray-500 mb-1">Action</label>
-                <select name="locked"
-                        class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <select name="locked" class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
                     <option value="true">Lock</option>
                     <option value="false">Unlock</option>
                 </select>
             </div>
-            <button type="submit"
-                    class="bg-gray-700 hover:bg-gray-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+            <button type="submit" class="bg-gray-700 hover:bg-gray-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
                 Update
             </button>
         </form>
